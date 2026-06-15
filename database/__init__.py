@@ -2,4 +2,4 @@
 from .connection import iniciar_banco
 
 #Importa do queries.py
-from .queries import distancia_total_corrida, lista_tenis, lancar_corrida_db, historico_corridas, total_corrido_tenis
+from .queries import distancia_total_corrida, lista_tenis, lancar_corrida_db, historico_corridas, total_corrido_tenis, excluir_corrida_db

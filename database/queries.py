@@ -28,13 +28,12 @@ def historico_corridas():
     conn = sqlite3.connect("corridas.db")
     cursor = conn.cursor()
     cursor.execute("""
-    SELECT c.data, t.tenis, c.distancia, c.tempo
+    SELECT c.id, c.data, t.tenis, c.distancia, c.tempo
     FROM corridas AS c
     JOIN tenis AS t ON C.tenis_id = t.tenis_id
     ORDER BY c.data DESC
     """)
     resultado = cursor.fetchall()
-
     conn.close()
     return resultado
 
@@ -49,4 +48,12 @@ def total_corrido_tenis():
     ORDER BY distancia_corrida DESC
     """)
     resultado = cursor.fetchall()
+    conn.close()
     return resultado
+
+def excluir_corrida_db(id):
+    conn = sqlite3.connect("corridas.db")
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM corridas WHERE id = ?",(id,))
+    conn.commit()
+    conn.close()
