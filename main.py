@@ -1,5 +1,5 @@
 import dearpygui.dearpygui as dpg
-from database import iniciar_banco, distancia_total_corrida, lista_tenis, lancar_corrida_db, historico_corridas, total_corrido_tenis, excluir_corrida_db
+from database import iniciar_banco, distancia_total_corrida, lista_tenis, lancar_corrida_db, historico_corridas, total_corrido_tenis, excluir_corrida_db, editar_corrida_db
 
 largura = 600
 altura = 500
@@ -58,18 +58,26 @@ def atualizar_tabela_corridas():
         parent="container_tabela_corridas",
         borders_innerH=True,borders_outerH=True,borders_innerV=True, borders_outerV=True
         ):
-        dpg.add_table_column(label="ID", width_fixed=True, init_width_or_weight=20, no_resize=True)
         dpg.add_table_column(label="Data")
         dpg.add_table_column(label="Tênis")
         dpg.add_table_column(label="Distância")
         dpg.add_table_column(label="Tempo")
         for id, data, tenis, distancia, tempo in historico:
             with dpg.table_row():
-                dpg.add_text(id)
                 linha_clicavel = dpg.add_selectable(label=data, span_columns=True, tag=id)
-                with dpg.popup(parent=linha_clicavel, mousebutton=dpg.mvMouseButton_Right):
-                    dpg.add_menu_item(label="Editar Corrida", callback=abrir_edicao_corrida, user_data=id)
-                    dpg.add_menu_item(label="Excluir Corrida", callback=excluir_corrida, user_data=id)
+                tag_popup = f"popup_{id}"
+                if dpg.does_alias_exist(tag_popup):
+                    dpg.delete_item(tag_popup)
+                with dpg.popup(parent=linha_clicavel, mousebutton=dpg.mvMouseButton_Right, tag=tag_popup):
+                    dpg.add_text("Edição Rápida")
+                    dpg.add_separator()
+
+                    dpg.add_input_text(label="Data", default_value=data, tag=f"edit_data_{id}")
+                    dpg.add_input_text(label="Tenis", default_value=tenis, tag=f"edit_tenis_{id}")
+                    dpg.add_input_text(label="Distancia", default_value=distancia, tag=f"edit_distancia_{id}")
+                    dpg.add_input_text(label="Tempo", default_value=tempo, tag=f"edit_tempo_{id}")
+                    dpg.add_menu_item(label="Salvar", callback=editar_corrida, user_data=id)
+                    dpg.add_menu_item(label="Excluir", callback=excluir_corrida, user_data=id)
                 dpg.add_text(tenis)
                 dpg.add_text(distancia)
                 dpg.add_text(tempo)
@@ -99,11 +107,17 @@ def formata_data(data):
     data_formatada = data[-2:] + "/" + data[5:7] + "/" + data[0:4]
     return data_formatada
 
-def abrir_edicao_corrida():
-    print("Edição corrida")
+def editar_corrida(sender, app_data, user_data):
+    id = user_data
+    nova_data = dpg.get_value(f"edit_data_{id}")
+    novo_tenis = dpg.get_value(f"edit_tenis_{id}")
+    nova_distancia = dpg.get_value(f"edit_distancia_{id}")
+    novo_tempo = dpg.get_value(f"edit_tempo_{id}")
+
+    editar_corrida_db(id, nova_data, novo_tenis, nova_distancia, novo_tempo)
+    atualizar_tabela_corridas()
 
 def excluir_corrida(sender, app_data, user_data):
-    print("Teste", user_data)
     excluir_corrida_db(user_data)
     atualizar_tabela_corridas()
 

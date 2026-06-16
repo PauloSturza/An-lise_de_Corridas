@@ -57,3 +57,17 @@ def excluir_corrida_db(id):
     cursor.execute("DELETE FROM corridas WHERE id = ?",(id,))
     conn.commit()
     conn.close()
+
+def editar_corrida_db(id, data, tenis, distancia, tempo):
+    conn = sqlite3.connect("corridas.db")
+    cursor = conn.cursor()
+    cursor.execute("""
+    UPDATE corridas 
+    SET data = ?, 
+    tenis_id = (SELECT tenis_id FROM tenis WHERE tenis = ?), 
+    distancia = ?, 
+    tempo = ?
+    WHERE id = ?
+    """, (data, tenis, distancia, tempo, id))
+    conn.commit()
+    conn.close()
